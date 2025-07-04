@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    container_name: daily-quote-api
+    ports:
+      - "6000:8000"
+    volumes:
+      - ./.env:/app/.env
+      - ./daily_quotes.db:/app/daily_quotes.db
+    restart: unless-stopped

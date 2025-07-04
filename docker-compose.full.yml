@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    container_name: daily-quote-backend
+    volumes:
+      - ./.env:/app/.env
+      - ./daily_quotes.db:/app/daily_quotes.db
+    networks:
+      - daily-quote-network
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: daily-quote-frontend
+    ports:
+      - "6001:80"
+    depends_on:
+      - backend
+    networks:
+      - daily-quote-network
+    restart: unless-stopped
+
+networks:
+  daily-quote-network:
+    driver: bridge

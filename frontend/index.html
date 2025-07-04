@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日一言</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #e74c3c;
+            --text-light: #7f8c8d;
+            --bg-paper: #fefefe;
+        }
+
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            position: relative;
+            animation: backgroundShift 20s ease-in-out infinite;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% {
+                background-position: 0% 0%, 100% 100%, 50% 50%;
+            }
+            50% {
+                background-position: 100% 100%, 0% 0%, 25% 75%;
+            }
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="0.5" fill="%23000" opacity="0.02"/><circle cx="75" cy="75" r="0.3" fill="%23000" opacity="0.015"/><circle cx="50" cy="10" r="0.4" fill="%23000" opacity="0.01"/><circle cx="10" cy="60" r="0.2" fill="%23000" opacity="0.02"/><circle cx="90" cy="40" r="0.3" fill="%23000" opacity="0.015"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .daily-card {
+            background:
+                linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow:
+                0 25px 50px rgba(0,0,0,0.08),
+                0 0 0 1px rgba(255,255,255,0.1) inset,
+                0 1px 0 rgba(255,255,255,0.6) inset;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            z-index: 2;
+        }
+
+        .daily-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(231, 76, 60, 0.6) 25%,
+                rgba(243, 156, 18, 0.8) 50%,
+                rgba(231, 76, 60, 0.6) 75%,
+                transparent 100%);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .date-display {
+            font-family: 'Ma Shan Zheng', cursive;
+            color: var(--text-light);
+        }
+
+        .quote-text {
+            color: var(--primary-color);
+            line-height: 1.8;
+            text-align: justify;
+            text-justify: inter-ideograph;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+            position: relative;
+        }
+
+        .quote-text::before {
+            content: '"';
+            position: absolute;
+            left: -0.5em;
+            top: -0.1em;
+            font-size: 1.5em;
+            color: rgba(231, 76, 60, 0.3);
+            font-family: serif;
+        }
+
+        .quote-text::after {
+            content: '"';
+            position: absolute;
+            right: -0.3em;
+            bottom: -0.3em;
+            font-size: 1.5em;
+            color: rgba(231, 76, 60, 0.3);
+            font-family: serif;
+        }
+
+        .author-text {
+            color: var(--secondary-color);
+            position: relative;
+            font-style: italic;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.6);
+        }
+
+        .author-text::before {
+            content: '——';
+            margin-right: 8px;
+            color: rgba(231, 76, 60, 0.6);
+            font-weight: 300;
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--accent-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .fade-in {
+            animation: fadeIn 1.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+                filter: blur(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0px);
+            }
+        }
+
+        .daily-card {
+            transition: all 0.3s ease;
+        }
+
+        .daily-card:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 35px 60px rgba(0,0,0,0.12),
+                0 0 0 1px rgba(255,255,255,0.15) inset,
+                0 1px 0 rgba(255,255,255,0.7) inset;
+        }
+
+        .action-btn {
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(127, 140, 141, 0.2);
+            color: var(--text-light);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(231, 76, 60, 0.1);
+            border-color: rgba(231, 76, 60, 0.3);
+            color: var(--accent-color);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.15);
+        }
+
+        .action-btn:hover::before {
+            left: 100%;
+        }
+
+        .corner-decoration {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border: 1.5px solid rgba(231, 76, 60, 0.3);
+            border-radius: 2px;
+        }
+
+        .corner-decoration.top-left {
+            top: 24px;
+            left: 24px;
+            border-right: none;
+            border-bottom: none;
+            border-top-left-radius: 4px;
+        }
+
+        .corner-decoration.bottom-right {
+            bottom: 24px;
+            right: 24px;
+            border-left: none;
+            border-top: none;
+            border-bottom-right-radius: 4px;
+        }
+
+        @media (max-width: 640px) {
+            .daily-card {
+                margin: 20px;
+                border-radius: 12px;
+            }
+
+            .corner-decoration {
+                width: 15px;
+                height: 15px;
+            }
+
+            .corner-decoration.top-left {
+                top: 15px;
+                left: 15px;
+            }
+
+            .corner-decoration.bottom-right {
+                bottom: 15px;
+                right: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 主要内容区域 -->
+    <main class="min-h-screen flex items-center justify-center p-4 opacity-0 animate-page-load">
+
+        <style>
+            .animate-page-load {
+                animation: pageLoad 1.5s ease-out forwards;
+            }
+
+            @keyframes pageLoad {
+                from {
+                    opacity: 0;
+                    transform: scale(0.98);
+                }
+                to {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+        </style>
+        <!-- 日签卡片容器 -->
+        <div class="w-full max-w-lg">
+            <!-- 加载状态 -->
+            <div id="loadingState" class="daily-card p-12 text-center">
+                <div class="loading-spinner mx-auto mb-4"></div>
+                <p class="text-gray-500 text-sm">正在获取今日语录...</p>
+            </div>
+
+            <!-- 日签卡片 -->
+            <div id="quoteCard" class="daily-card hidden fade-in relative">
+                <!-- 装饰性边角 -->
+                <div class="corner-decoration top-left"></div>
+                <div class="corner-decoration bottom-right"></div>
+
+                <!-- 卡片内容 -->
+                <div class="p-8 sm:p-12 relative">
+                    <!-- 微妙的内容背景 -->
+                    <div class="absolute inset-4 bg-gradient-to-br from-white/20 to-transparent rounded-xl pointer-events-none"></div>
+                    <div class="relative z-10">
+                    <!-- 日期显示 -->
+                    <div class="text-center mb-8">
+                        <p id="quoteDate" class="date-display text-lg mb-3"></p>
+                        <div class="relative mx-auto w-20">
+                            <div class="h-px bg-gradient-to-r from-transparent via-red-300 to-transparent"></div>
+                            <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-2 h-px bg-gradient-to-r from-red-400 to-orange-400"></div>
+                        </div>
+                    </div>
+
+                    <!-- 语录内容 -->
+                    <div class="mb-8">
+                        <blockquote class="quote-text text-lg sm:text-xl leading-relaxed mb-6" id="quoteContent">
+                            <!-- 语录内容将在这里显示 -->
+                        </blockquote>
+
+                        <div class="text-right">
+                            <cite class="author-text text-base font-medium" id="quoteAuthor">
+                                <!-- 作者将在这里显示 -->
+                            </cite>
+                        </div>
+                    </div>
+
+                    <!-- 操作按钮 -->
+                    <div class="flex justify-center space-x-8 text-sm">
+                        <button id="copyBtn" class="action-btn px-4 py-2 rounded-full transition-all">
+                            复制
+                        </button>
+                        <button id="historyBtn" class="action-btn px-4 py-2 rounded-full transition-all">
+                            历史
+                        </button>
+                    </div>
+                    </div> <!-- 关闭 relative z-10 div -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 错误状态 -->
+        <div id="errorState" class="daily-card hidden p-8 text-center">
+            <div class="text-red-400 mb-4">
+                <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-700 mb-2">获取语录失败</h3>
+            <p id="errorMessage" class="text-gray-500 mb-6 text-sm"></p>
+            <button id="retryBtn" class="action-btn px-6 py-2 rounded-full transition-all">
+                重试
+            </button>
+        </div>
+
+        <!-- 历史语录模态框 -->
+        <div id="historyModal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="daily-card max-w-md w-full max-h-[70vh] overflow-hidden">
+                <div class="p-6 border-b border-gray-100">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-medium text-gray-800">历史语录</h3>
+                        <button id="closeHistoryBtn" class="text-gray-400 hover:text-gray-600 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div id="historyContent" class="p-6 overflow-y-auto max-h-80">
+                    <!-- 历史语录列表将在这里显示 -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 简约页脚 -->
+    <footer class="fixed bottom-4 left-4 text-xs text-gray-400">
+        每日一言
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
