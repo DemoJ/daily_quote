@@ -4,9 +4,13 @@ services:
   backend:
     build: .
     container_name: daily-quote-backend
+    environment:
+      - TZ=Asia/Shanghai
     volumes:
       - ./.env:/app/.env
       - ./daily_quotes.db:/app/daily_quotes.db
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     networks:
       - daily-quote-network
     restart: unless-stopped
@@ -14,8 +18,13 @@ services:
   frontend:
     build: ./frontend
     container_name: daily-quote-frontend
+    environment:
+      - TZ=Asia/Shanghai
     ports:
       - "6001:80"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     depends_on:
       - backend
     networks:

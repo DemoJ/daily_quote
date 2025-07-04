@@ -4,9 +4,13 @@ services:
   backend:
     build: .
     container_name: daily-quote-api
+    environment:
+      - TZ=Asia/Shanghai
     ports:
       - "6000:8000"
     volumes:
       - ./.env:/app/.env
       - ./daily_quotes.db:/app/daily_quotes.db
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     restart: unless-stopped
