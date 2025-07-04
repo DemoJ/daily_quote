@@ -20,7 +20,7 @@
 - **前端**: 纯静态HTML/CSS/JS + Nginx（可选预览组件）
 - **AI**: OpenAI SDK
 - **定时任务**: APScheduler
-- **部署**: Docker + Docker Compose
+- **部署**: Docker Compose
 
 ## 快速开始
 
@@ -36,7 +36,7 @@ cp .env.example .env
 touch daily_quotes.db
 
 # 3. 启动API服务
-docker-compose -f docker-compose.api.yml up -d
+docker compose -f docker-compose.api.yml up -d
 
 # 4. 访问API
 curl http://localhost:6000/api/quote
@@ -52,7 +52,7 @@ cp .env.example .env
 touch daily_quotes.db
 
 # 3. 启动完整服务
-docker-compose -f docker-compose.full.yml up -d
+docker compose -f docker-compose.full.yml up -d
 
 # 4. 访问前端
 open http://localhost:6001

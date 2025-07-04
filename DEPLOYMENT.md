@@ -22,7 +22,7 @@ cp .env.example .env
 touch daily_quotes.db
 
 # 3. 启动API服务
-docker-compose -f docker-compose.api.yml up -d
+docker compose -f docker-compose.api.yml up -d
 
 # 4. 访问API
 curl http://localhost:6000/api/quote
@@ -46,7 +46,7 @@ cp .env.example .env
 touch daily_quotes.db
 
 # 3. 启动完整服务
-docker-compose -f docker-compose.full.yml up -d
+docker compose -f docker-compose.full.yml up -d
 
 # 4. 访问服务
 open http://localhost:6001
@@ -124,7 +124,7 @@ GET /health
 ### 常见问题
 
 1. **API密钥错误**：检查 `.env` 文件中的 `OPENAI_API_KEY`
-2. **端口冲突**：修改 docker-compose 文件中的端口映射
+2. **端口冲突**：修改 compose 文件中的端口映射
 3. **数据库问题**：删除 `./daily_quotes.db` 文件重新初始化
 
 ### 查看日志
@@ -134,7 +134,7 @@ GET /health
 docker logs daily-quote-api
 
 # 查看完整服务日志
-docker-compose -f docker-compose.full.yml logs
+docker compose -f docker-compose.full.yml logs
 ```
 
 ## 开发模式
